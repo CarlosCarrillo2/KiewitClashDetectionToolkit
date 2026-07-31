@@ -1,0 +1,97 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>NavisworksDockPanel.AddIn</AssemblyName>
+    <RootNamespace>NavisworksDockPanel.AddIn</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Navisworks assemblies are already loaded by Navisworks.exe at runtime; do not copy local. -->
+    <PackageReference Include="Chuongmep.Navis.Api.Autodesk.Navisworks.Api" Version="2026.0.0">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <!-- Deliberately NO Microsoft.Web.WebView2 reference here - that dependency lives only
+         in WebViewHost, loaded by reflection at runtime (see WebUiDockPanePlugin.cs). This
+         assembly must stay free of any private/non-GAC dependency so Navisworks' plugin
+         scan of it can never fail due to an unresolvable reference. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Clash Detective API - a separate assembly from the core Navisworks.Api, not on
+         NuGet. Safe to reference directly (unlike WebView2): Navisworks itself already
+         loads this DLL as part of its own Clash Detective feature, so it's always
+         resolvable in-process, same as the core Api reference above. -->
+    <Reference Include="Autodesk.Navisworks.Clash">
+      <HintPath>C:\Program Files\Autodesk\Navisworks Manage 2026\Autodesk.Navisworks.Clash.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- ComApi bridge - used by the Group Zones feature (VolumeClashGroupingService.cs) to
+         extract real triangle-mesh geometry for non-cuboid Revit zone volumes. Same safety
+         profile as the Clash reference above: Navisworks itself already loads these DLLs. -->
+    <Reference Include="Autodesk.Navisworks.ComApi">
+      <HintPath>C:\Program Files\Autodesk\Navisworks Manage 2026\Autodesk.Navisworks.ComApi.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Autodesk.Navisworks.Interop.ComApi">
+      <HintPath>C:\Program Files\Autodesk\Navisworks Manage 2026\Autodesk.Navisworks.Interop.ComApi.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- JSON for the WebView2<->native message bridge - a .NET Framework GAC assembly,
+         always resolvable, same safety profile as WPF/WinForms above. -->
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+  <!-- Deliberately a plain file copy, NOT a ProjectReference - a ProjectReference adds a
+       compile-time AssemblyRef to NavisworksDockPanel.WebViewHost.dll even with no code
+       using it, which risks reintroducing the eager-dependency-resolution problem this
+       whole split exists to avoid. WebUiDockPanePlugin loads it purely via reflection at
+       runtime, so AddIn.dll's own metadata must have zero reference to it. Build WebViewHost
+       first (or via the solution), then this copies its output next to AddIn's own DLL. -->
+  <Target Name="CopyWebViewHostOutput" AfterTargets="Build">
+    <ItemGroup>
+      <WebViewHostFiles Include="..\WebViewHost\bin\Debug\**\*" Condition="Exists('..\WebViewHost\bin\Debug')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WebViewHostFiles)" DestinationFolder="$(OutDir)%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <!-- Navisworks ribbon XAML: a plain resource file read by RibbonLayoutAttribute at
+         runtime, not a compiled WPF Page - must sit next to the DLL in the output folder.
+         Navisworks looks for it inside a locale subfolder matching roamer.exe's running UI
+         language (e.g. en-US, es-ES) - a root-level copy alone is not sufficient. -->
+    <Page Remove="TestDockPaneRibbon.xaml" />
+    <Page Remove="en-US\TestDockPaneRibbon.xaml" />
+    <Page Remove="es-ES\TestDockPaneRibbon.xaml" />
+    <Content Include="TestDockPaneRibbon.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="en-US\TestDockPaneRibbon.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>en-US\TestDockPaneRibbon.xaml</Link>
+    </Content>
+    <Content Include="es-ES\TestDockPaneRibbon.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>es-ES\TestDockPaneRibbon.xaml</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ribbon button icons - embedded as WPF resources (pack://application:,,,/AssemblyName;
+         component/Images/...) rather than loose Content read via pack://siteOfOrigin. This
+         plugin never creates a System.Windows.Application (Navisworks is a WinForms host), so
+         siteOfOrigin has no base URI to resolve against and every Image/LargeImage silently
+         failed to load, rendering as the ribbon's "?" broken-image glyph regardless of
+         whether the file existed on disk. Embedded resources resolve purely from the
+         assembly's own manifest, independent of any host Application. -->
+    <Resource Include="Images\**\*.ico" />
+  </ItemGroup>
+
+</Project>

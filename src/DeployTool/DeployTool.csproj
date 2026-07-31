@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>DeployNavisworksPlugins</AssemblyName>
+    <RootNamespace>DeployTool</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <!-- Not a ProjectReference on purpose (AddIn/WebViewHost's own boundary rules don't apply
+       here - this just copies AddIn's already-built output, it doesn't add a compile-time
+       reference to anything). Bundling AddIn's bin\$(Configuration) output into this project's
+       own output folder as "Payload" is what makes the built DeployTool folder self-contained:
+       zip src\DeployTool\bin\$(Configuration) as a whole and it deploys correctly on any
+       machine, instead of the exe reaching back into this specific checkout's source tree. -->
+  <Target Name="BundleAddInPayload" AfterTargets="Build">
+    <ItemGroup>
+      <AddInPayloadFiles Include="$(MSBuildThisFileDirectory)..\AddIn\bin\$(Configuration)\**\*.*" />
+    </ItemGroup>
+    <Copy
+        SourceFiles="@(AddInPayloadFiles)"
+        DestinationFolder="$(OutDir)Payload\%(RecursiveDir)"
+        SkipUnchangedFiles="true"
+        Condition="'@(AddInPayloadFiles)' != ''" />
+  </Target>
+
+</Project>

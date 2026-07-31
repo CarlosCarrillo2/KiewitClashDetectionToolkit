@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RibbonControl
+    xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"
+    xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Autodesk.Navisworks.Gui.Roamer.AIRLook;assembly=navisworks.gui.roamer"
+    x:Uid="TestDockPaneRibbon">
+  <RibbonTab
+      x:Uid="TestDockPaneRibbonTab"
+      Id="TestDockPaneTab"
+      Title="Kiewit"
+      KeyTip="K"
+      IsActive="False"
+      IsVisible="True"
+      Name="Kiewit">
+    <RibbonPanel x:Uid="TestDockPanePanel" IsCollapsed="False" IsVisible="True">
+      <RibbonPanelSource
+          x:Uid="TestDockPanePanelSource"
+          Id="TestDockPanePanelSource"
+          KeyTip="C"
+          Title="Coordination"
+          Name="Coordination">
+        <RibbonFlowPanel x:Uid="ClashTestActionsFlowPanel" MaxRowNumber="2">
+          <local:NWRibbonButton
+              x:Uid="ActivateWebUiDockPaneButton"
+              Id="ActivateWebUiDockPane"
+              KeyTip="G"
+              ShowText="True"
+              Text="Clash Test Generation"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_ClashTests_16.ico"
+              Size="Standard" />
+          <local:NWRibbonButton
+              x:Uid="ActivateDeleteClashDockPaneButton"
+              Id="ActivateDeleteClashDockPane"
+              KeyTip="D"
+              ShowText="True"
+              Text="Delete Clash Tests"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_DeleteClashTests_16.ico"
+              Size="Standard" />
+        </RibbonFlowPanel>
+        <local:NWRibbonButton
+            x:Uid="GroupZonesButton"
+            Id="GroupZones"
+            KeyTip="Z"
+            ShowText="True"
+            Text="Group&#xD;&#xA;Zones"
+            Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_GroupZones_16.ico"
+            LargeImage="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_GroupZones_32.ico"
+            Size="Large"
+            Orientation="Vertical" />
+        <RibbonFlowPanel x:Uid="PlaceholderFlowPanel" MaxRowNumber="3">
+          <local:NWRibbonButton
+              x:Uid="GroupInvolvingItemsButton"
+              Id="GroupInvolvingItems"
+              KeyTip="1"
+              ShowText="True"
+              Text="Group Involving Items"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_GroupInvolvingItems_16.ico"
+              Size="Standard" />
+          <local:NWRibbonButton
+              x:Uid="GroupByModelButton"
+              Id="GroupByModel"
+              KeyTip="2"
+              ShowText="True"
+              Text="Group by Model Priority"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_GroupByModel_16.ico"
+              Size="Standard" />
+          <local:NWRibbonButton
+              x:Uid="SignOffAreaButton"
+              Id="SignOffArea"
+              KeyTip="4"
+              ShowText="True"
+              Text="Sign Off Area"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_Placeholder3_16.ico"
+              Size="Standard" />
+          <local:NWRibbonButton
+              x:Uid="ClashesToViewpointsButton"
+              Id="ClashesToViewpoints"
+              KeyTip="5"
+              ShowText="True"
+              Text="Clashes to Viewpoints"
+              Image="pack://application:,,,/NavisworksDockPanel.AddIn;component/Images/Ribbon_Placeholder1_16.ico"
+              Size="Standard" />
+        </RibbonFlowPanel>
+      </RibbonPanelSource>
+    </RibbonPanel>
+  </RibbonTab>
+</RibbonControl>

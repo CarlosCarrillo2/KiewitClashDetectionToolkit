@@ -1,0 +1,25 @@
+# .NET
+bin/
+obj/
+*.user
+
+# Node
+node_modules/
+src/WebUI/dist/
+
+# Add-in build output copied from WebUI
+src/AddIn/WebUiAssets/*
+!src/AddIn/WebUiAssets/.gitkeep
+src/WebViewHost/WebUiAssets/*
+!src/WebViewHost/WebUiAssets/.gitkeep
+
+# VS
+.vs/
+*.suo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Claude Code local-only settings (machine-specific permissions, not meant to be shared)
+.claude/settings.local.json
